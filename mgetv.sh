@@ -55,6 +55,11 @@ function getv() {
 			echo "the video is too long, ignored..."
 			break
 		else
+			grep -q "^Location:.*\/video_missing$" link_head.txt
+			if [ $? -eq 0 ]; then
+				echo "Missing video..."
+				break
+			fi
 			echo "unknown error type, ignore"
 		fi
 		((hours--))
@@ -62,7 +67,7 @@ function getv() {
 	done
 
 	#[ -z "$file" ] && echo "cannot get video $key address, ignored"
-	rm -f $conf
+	rm -f $conf link_head.txt
 	#[ -z "$file" ] && return
 	#curl $proxy -O $file
 }
