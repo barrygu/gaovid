@@ -8,7 +8,7 @@ keylist=$key"_lists.txt"
 
 [ -f $query_result ] || wget -O $query_result "$query_url$key"
 [ -f $keylist ] || sed -ne "/href=\"\/video[^>]\+><img/s/.*\/video\/\([0-9a-f]\+\)\/.*/\1/p" $query_result > $keylist
-list=`cat $keylist`
+list=`tac $keylist`
 
 #echo $list
 ./mgetv.sh $list
