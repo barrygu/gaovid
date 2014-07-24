@@ -43,7 +43,12 @@ function getv() {
 			sleep 15
 		done
 		if [ -n "$file" ]; then
-			curl $proxy -O $file
+			for (( retry = 5; retry > 0; retry-- ))
+			do
+				curl $proxy -O $file
+				[ $? -eq 0 ] && break
+				sleep 120
+			done
 			break;
 		fi
 		link=`sed -ne "s/^[ \t]*<link>\(http:\/\/.*\/video\/[0-9]\+\)<\/link>.*$/\1/p" $conf`
