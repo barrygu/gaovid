@@ -6,6 +6,8 @@ debug=false
 
 #ipaddr=`echo $SSH_CLIENT | sed "s/ .*//"`
 #proxy="--socks5 $ipaddr:7070"
+# use Proxy varible while reach the limitation
+Proxy=
 proxy=
 
 function getv() {
@@ -28,7 +30,7 @@ function getv() {
 		echo $cmd
 		while [ $retry -gt 0 ]; do
 			rm -f $conf
-			eval $cmd > $conf
+			$cmd > $conf
 			#file=`cat $conf | sed -n -e "$exp"`
 			file=`sed -ne "$exp" $conf`
 			if [ -n "$file" ]; then
@@ -45,7 +47,7 @@ function getv() {
 		if [ -n "$file" ]; then
 			for (( retry = 5; retry > 0; retry-- ))
 			do
-				curl $proxy -O $file
+				curl -O $file
 				[ $? -eq 0 ] && break
 				sleep 120
 			done
@@ -55,6 +57,10 @@ function getv() {
 		curl -Is $link > link_head.txt
 		err_type=`sed -ne "s/^Location:.*\/needtoken\/\([^\/]\+\)\/[0-9]\+$/\1/p" link_head.txt`
 		if [ "$err_type" == "reach_limit" ]; then
+			if [ -z "$proxy" -a -n "$Proxy" ]; then
+				echo "try using proxy to get config"
+				continue
+			fi
 			echo "reach limit, waiting for an hour and try it again..."
 		elif [ "$err_type" == "long_video" ]; then
 			echo "the video is too long, ignored..."
@@ -76,6 +82,16 @@ function getv() {
 	#[ -z "$file" ] && return
 	#curl $proxy -O $file
 }
+
+if [ $# -ge 1 ]; then
+	if [ $1 == "-p" ]; then
+		shift
+		[ $# -ge 1 ] && proxy=$1; shift
+	elif [ $1 == "-P" ]; then
+		shift
+		[ $# -ge 1 ] && Proxy=$1; shift
+	fi
+fi
 
 while [ $# -ge 1 ]
 do
