@@ -28,11 +28,12 @@ for vnum in ${numbs[@]}; do
 	
 	printf "\nChecking: $vnum\n"
 	while true; do
-		pg_nums=(`sed -ne "s/.*\/videos\/tmb\/\([0-9]\+\)\/.*/\1/p" $pg_file`)
-		[ ${#pg_nums[@]} -eq 0 ] && exit
+		pg_nums=(`sed -ne "s/.*\/videos\/tmb[0-9]*\/\([0-9]\+\)\/.*/\1/p" $pg_file`)
+		npp=${#pg_nums[@]}
+		[ $npp -eq 0 ] && exit
 
 		if [ $vnum -le ${pg_nums[0]} -a $vnum -ge ${pg_nums[(($npp-1))]} ]; then
-			echo "Found vnum in current page"
+			echo "Found vnum($vnum) in page $pg_cur"
 			title=$(sed -ne "/\/$vnum\//"'s/^.*title="\([^"]\+\)" .*/\1/p' $pg_file)
 			[ -z "$title" ] && title="Unknown"
 			printf "%d --> %s\r\n" $vnum "$title" >> $target
@@ -48,10 +49,13 @@ for vnum in ${numbs[@]}; do
 			step=`expr \( $step_m - $vnum \) / $npp`
 			if [ $(( last_step + step )) -eq 0 ]; then
 				bounds=1
-				let step=last_step/-2
 			fi
-		else
-			let step/=-2
+		fi
+		
+		if [ $bounds -eq 1 ]; then
+			step=0
+			[ $vnum -gt ${pg_nums[0]} ] && step=-1
+			[ $vnum -lt ${pg_nums[(($npp-1))]} ] && step=1
 		fi
 
 		if [ $step -eq 0 ]; then
