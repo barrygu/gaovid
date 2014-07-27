@@ -11,7 +11,6 @@ function get_vpage()
 {
 	pg_file=page_$1.txt
 	[ -f "$pg_file" ] || wget -O $pg_file "$base_url$1"
-	#[ -f "$pg_file" ] || cp videos.txt $pg_file
 }
 
 npp=31
@@ -44,7 +43,7 @@ for vnum in ${numbs[@]}; do
 			step_m=${pg_nums[(($npp-1))]}
 		fi
 
-		echo last_step: $last_step
+		#echo last_step: $last_step
 		if [ $bounds -eq 0 ]; then
 			step=`expr \( $step_m - $vnum \) / $npp`
 			if [ $(( last_step + step )) -eq 0 ]; then
@@ -56,9 +55,15 @@ for vnum in ${numbs[@]}; do
 			step=0
 			[ $vnum -gt ${pg_nums[0]} ] && step=-1
 			[ $vnum -lt ${pg_nums[(($npp-1))]} ] && step=1
+			if [ $(( last_step + step )) -eq 0 ]; then
+				echo "Cannot find title of $vnum, last page is $pg_cur"
+				printf "%d --> %s\r\n" $vnum "Unknown~" >> $target
+				break
+			fi
 		fi
 
 		if [ $step -eq 0 ]; then
+			echo "Cannot find title of $vnum, last page is $pg_cur"
 			printf "%d --> %s\r\n" $vnum "Unknown~" >> $target
 			break
 		fi
