@@ -11,12 +11,12 @@ function get_vpage()
 	if [ -f "$pg_file" ]; then
 		echo "page $1 has already existed"
 	else
-		echo "getting $1 page from web..."
+		echo "getting page $1 from web..."
 		wget -qO $pg_file "$base_url$1"
 	fi
 }
 
-npp=31
+nItems=31
 pg_cur=1
 get_vpage $pg_cur
 pg_last=`sed -n -e "/pagination/s/.*&nbsp;\(.*\)class.*/\1/" -e 's/.*[0-9]\+">\([0-9]\+\)<.*/\1/p' page_1.txt`
@@ -34,32 +34,27 @@ for vnum in ${numbs[@]}; do
 	while true; do
 		(( loop_count++ ))
 		pg_nums=(`sed -ne "s/.*\/videos\/tmb[0-9]*\/\([0-9]\+\)\/.*/\1/p" $pg_file`)
-		npp=${#pg_nums[@]}
-		[ $npp -eq 0 ] && exit
+		nItems=${#pg_nums[@]}
+		[ $nItems -eq 0 ] && exit
 
-		#if [ $vnum -le ${pg_nums[0]} -a $vnum -ge ${pg_nums[(($npp-1))]} ]; then
-		if (( $vnum <= ${pg_nums[0]} && $vnum >= ${pg_nums[(($npp-1))]} )); then
+		if (( $vnum <= ${pg_nums[0]} && $vnum >= ${pg_nums[(($nItems-1))]} )); then
 			echo "Found vnum($vnum) in page $pg_cur"
 			title=$(sed -ne "/\/$vnum\//"'s/^.*title="\([^"]\+\)" .*/\1/p' $pg_file)
 			if [ -z "$title" ]; then
-				title="Unknown"
-				echo "vnum($vnum) is lost"
+				title="Deleted"
+				echo "vnum($vnum) may be deleted."
 			fi
 			printf "%d --> %s\r\n" $vnum "$title" >> $target
 			break
-		#elif [ $vnum -lt ${pg_nums[(($npp-1))]} ]; then
-		elif (( $vnum < ${pg_nums[(($npp-1))]} )); then
+		elif (( $vnum < ${pg_nums[(($nItems-1))]} )); then
 			foot=${pg_nums[0]}
-		#elif [ $vnum -gt ${pg_nums[0]} ]; then
 		elif (( $vnum > ${pg_nums[0]} )); then
-			foot=${pg_nums[(($npp-1))]}
+			foot=${pg_nums[(($nItems-1))]}
 		fi
 
-		#echo last_step: $last_step
 		if [ $bounds -eq 0 ]; then
-			#step=`expr \( $foot - $vnum \) / $npp`
-			step=$(( ( foot - vnum ) / npp ))
-			#if [ $(( last_step + step )) -eq 0 ]; then
+			(( step = ( foot - vnum ) / nItems ))
+			(( step > 1 )) && (( step = step * 2 / 3 ))
 			if (( last_step + step == 0 )); then
 				bounds=1
 			fi
@@ -68,29 +63,30 @@ for vnum in ${numbs[@]}; do
 		if [ $bounds -eq 1 ]; then
 			if (( $vnum > ${pg_nums[0]} )); then
 				step=-1
-			elif (( $vnum < ${pg_nums[(($npp-1))]} )); then
+			elif (( $vnum < ${pg_nums[(($nItems-1))]} )); then
 				step=1
 			else
 				step=0;
 			fi
 
 			if (( last_step + step == 0 )); then
-				echo "enter bounds again, $vnum cannot be found, last page is $pg_cur"
-				printf "%d --> %s\r\n" $vnum "Unknown~" >> $target
+				echo "enter bounds again, no page contains $vnum, last checked page is $pg_cur"
+				printf "%d --> %s\r\n" $vnum "Not found" >> $target
 				break
 			fi
 		fi
 
 		if [ $step -eq 0 ]; then
-			echo "Cannot find title of $vnum, last page is $pg_cur"
-			printf "%d --> %s\r\n" $vnum "Unknown~" >> $target
+			echo "no page contains $vnum, last checked page is $pg_cur"
+			printf "%d --> %s\r\n" $vnum "Not found" >> $target
 			break
 		fi
 
 		let pg_cur+=$step
 		last_step=$step
+		printf "step is %5d, " $step
 		if (( pg_cur > pg_last )); then 
-			echo "step is too long, use last page $pg_last instead $pg_cur."
+			echo "step is too long, use last page $pg_last to instead $pg_cur."
 			(( last_step = pg_last - ( pg_cur - last_step ) ))
 			pg_cur=$pg_last
 		fi
