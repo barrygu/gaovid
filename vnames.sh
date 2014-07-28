@@ -35,7 +35,10 @@ for vnum in ${numbs[@]}; do
 		if (( $vnum <= ${pg_nums[0]} && $vnum >= ${pg_nums[(($npp-1))]} )); then
 			echo "Found vnum($vnum) in page $pg_cur"
 			title=$(sed -ne "/\/$vnum\//"'s/^.*title="\([^"]\+\)" .*/\1/p' $pg_file)
-			[ -z "$title" ] && title="Unknown"
+			if [ -z "$title" ]; then
+				title="Unknown"
+				echo "vnum($vnum) is lost"
+			fi
 			printf "%d --> %s\r\n" $vnum "$title" >> $target
 			break
 		#elif [ $vnum -lt ${pg_nums[(($npp-1))]} ]; then
