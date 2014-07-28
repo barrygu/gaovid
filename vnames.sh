@@ -14,6 +14,7 @@ function get_vpage()
 npp=31
 pg_cur=1
 get_vpage $pg_cur
+pg_last=`sed -n -e "/pagination/s/.*&nbsp;\(.*\)class.*/\1/" -e 's/.*[0-9]\+">\([0-9]\+\)<.*/\1/p' page_1.txt`
 rm -f $target
 
 for vnum in ${numbs[@]}; do
@@ -81,6 +82,10 @@ for vnum in ${numbs[@]}; do
 
 		let pg_cur+=$step
 		last_step=$step
+		if (( pg_cur > pg_last )); then 
+			(( last_step = pg_last - ( pg_cur - last_step ) ))
+			pg_cur=$pg_last
+		fi
 
 		get_vpage $pg_cur
 	done
