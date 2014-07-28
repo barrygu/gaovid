@@ -8,7 +8,12 @@ target=desc.txt
 function get_vpage()
 {
 	pg_file=page_$1.txt
-	[ -f "$pg_file" ] || wget -qO $pg_file "$base_url$1"
+	if [ -f "$pg_file" ]; then
+		echo "page $1 has already existed"
+	else
+		echo "getting $1 page from web..."
+		wget -qO $pg_file "$base_url$1"
+	fi
 }
 
 npp=31
@@ -61,14 +66,16 @@ for vnum in ${numbs[@]}; do
 		fi
 		
 		if [ $bounds -eq 1 ]; then
-			step=0
-			#[ $vnum -gt ${pg_nums[0]} ] && step=-1
-			(( $vnum > ${pg_nums[0]} )) && step=-1
-			#[ $vnum -lt ${pg_nums[(($npp-1))]} ] && step=1
-			(( $vnum < ${pg_nums[(($npp-1))]} )) && step=1
-			#if [ $(( last_step + step )) -eq 0 ]; then
+			if (( $vnum > ${pg_nums[0]} )); then
+				step=-1
+			elif (( $vnum < ${pg_nums[(($npp-1))]} )); then
+				step=1
+			else
+				step=0;
+			fi
+
 			if (( last_step + step == 0 )); then
-				echo "Cannot find title of $vnum, last page is $pg_cur"
+				echo "enter bounds again, $vnum cannot be found, last page is $pg_cur"
 				printf "%d --> %s\r\n" $vnum "Unknown~" >> $target
 				break
 			fi
@@ -83,6 +90,7 @@ for vnum in ${numbs[@]}; do
 		let pg_cur+=$step
 		last_step=$step
 		if (( pg_cur > pg_last )); then 
+			echo "step is too long, use last page $pg_last instead $pg_cur."
 			(( last_step = pg_last - ( pg_cur - last_step ) ))
 			pg_cur=$pg_last
 		fi
