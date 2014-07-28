@@ -30,7 +30,7 @@ function getv() {
 		echo $cmd
 		while [ $retry -gt 0 ]; do
 			rm -f $conf
-			$cmd > $conf
+			eval $cmd > $conf
 			#file=`cat $conf | sed -n -e "$exp"`
 			file=`sed -ne "$exp" $conf`
 			if [ -n "$file" ]; then
