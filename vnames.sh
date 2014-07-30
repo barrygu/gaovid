@@ -1,6 +1,20 @@
 #!/bin/bash
 
-numbs=(`sort -gr $1`)
+if [ $# -eq 1 -a -f "$1" ]; then
+	numbs=(`sort -gr $1`)
+elif [ $# -ge 2 ]; then
+	if [ "$1" == "-n" ]; then
+		shift
+		numbs=${@}
+	else
+		echo "Invalid arguments 1"
+		exit
+	fi
+else
+	echo "Invalid arguments 2"
+	exit
+fi
+
 base_url="http://199.195.197.140/videos?page="
 pg_file=
 target=desc.txt
