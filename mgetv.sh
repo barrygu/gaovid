@@ -31,7 +31,6 @@ function getv() {
 		while [ $retry -gt 0 ]; do
 			rm -f $conf
 			eval $cmd > $conf
-			#file=`cat $conf | sed -n -e "$exp"`
 			file=`sed -ne "$exp" $conf`
 			if [ -n "$file" ]; then
 				echo url: $file
@@ -77,19 +76,22 @@ function getv() {
 		sleep 3600
 	done
 
-	#[ -z "$file" ] && echo "cannot get video $key address, ignored"
 	rm -f $conf link_head.txt
-	#[ -z "$file" ] && return
-	#curl $proxy -O $file
 }
 
 if [ $# -ge 1 ]; then
 	if [ $1 == "-p" ]; then
 		shift
-		[ $# -ge 1 ] && proxy=$1; shift
+		if [ $# -ge 1 ]; then
+			proxy=$1
+			shift
+		fi
 	elif [ $1 == "-P" ]; then
 		shift
-		[ $# -ge 1 ] && Proxy=$1; shift
+		if [ $# -ge 1 ]; then
+			Proxy=$1
+			shift
+		fi
 	fi
 fi
 
