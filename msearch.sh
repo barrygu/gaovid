@@ -13,7 +13,8 @@ query_result=$key"_results.html"
 keylist=$key"_lists.txt"
 
 [ -f $query_result ] || wget -O $query_result "$query_url$key"
-[ -f $keylist ] || sed -ne '/href="\/video[^>]\+><img/s/.*\/video\/\([0-9a-f]\+\)\/.*title="\([^"]\+\)".*/\1 \2/p' $query_result > $keylist
+#[ -f $keylist ] || sed -ne '/href="\/video[^>]\+><img/s/.*\/video\/\([0-9a-f]\+\)\/.*title="\([^"]\+\)".*/\1 \2/p' $query_result > $keylist
+[ -f $keylist ] || sed -ne 's/.*\/video\/\([0-9a-f]\+\)\/[^>]*><img.*\/tmb[0-9]*\/\([0-9]\+\)\/.*title="\([^"]\+\)".*/\1 \2 \3/p' $query_result > $keylist
 
 if [ $list_mode -eq 1 ]; then
 	tac $keylist
