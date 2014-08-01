@@ -64,6 +64,9 @@ function getv() {
 		elif [ "$err_type" == "long_video" ]; then
 			echo "the video is too long, ignored..."
 			break
+		elif [ "$err_type" == "hd_video" ]; then
+			echo "hd_video, no permission, ignored..."
+			break
 		else
 			grep -q "^Location:.*\/video_missing$" link_head.txt
 			if [ $? -eq 0 ]; then
