@@ -30,6 +30,17 @@ function get_vpage()
 	fi
 }
 
+function is_integer() 
+{
+#	[ "$1" -eq "$1" ] > /dev/null 2>&1
+#	return $?
+	re='^[0-9]+$'
+	if ! [[ "$1" =~ $re ]] ; then
+		return 1
+	fi
+	return 0
+}
+
 nItems=31
 pg_cur=1
 get_vpage $pg_cur
@@ -43,7 +54,8 @@ for vnum in ${numbs[@]}; do
 	last_step=0
 	bounds=0
 	loop_count=0
-	
+
+	is_integer $vnum || continue
 	printf "\nChecking: $vnum\n"
 	while true; do
 		(( loop_count++ ))
