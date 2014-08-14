@@ -100,7 +100,9 @@ fi
 
 while [ $# -ge 1 ]
 do
-	getv $1
+	key=$1
+	[ "${key:0:4}" == "http" ] && key=`echo $key | sed -ne "s/http:\/\/.*\/video\/\([0-9a-f]\+\)\/.*/\1/p"`
+	getv $key
 	shift
 done
 
