@@ -6,9 +6,10 @@ debug=false
 
 #ipaddr=`echo $SSH_CLIENT | sed "s/ .*//"`
 #proxy="--socks5 $ipaddr:7070"
+proxy="-x http://jiangu:Bag%400305@10.10.40.10:80"
 # use Proxy varible while reach the limitation
 Proxy=
-proxy=
+#proxy=
 
 function getv() {
 	local key=$1
@@ -46,14 +47,14 @@ function getv() {
 		if [ -n "$file" ]; then
 			for (( retry = 5; retry > 0; retry-- ))
 			do
-				curl -O $file
+				curl -O $proxy $file
 				[ $? -eq 0 ] && break
 				sleep 120
 			done
 			break;
 		fi
 		link=`sed -ne "s/^[ \t]*<link>\(http:\/\/.*\/video\/[0-9]\+\)<\/link>.*$/\1/p" $conf`
-		curl -Is $link > link_head.txt
+		curl -Is $proxy $link > link_head.txt
 		err_type=`sed -ne "s/^Location:.*\/needtoken\/\([^\/]\+\)\/[0-9]\+$/\1/p" link_head.txt`
 		if [ "$err_type" == "reach_limit" ]; then
 			if [ -z "$proxy" -a -n "$Proxy" ]; then
