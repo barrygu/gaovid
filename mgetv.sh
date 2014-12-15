@@ -1,15 +1,12 @@
 #!/bin/bash
 
-debug=false
-
-[ "$debug" == "true" ] && set -x
-
 #ipaddr=`echo $SSH_CLIENT | sed "s/ .*//"`
 #proxy="--socks5 $ipaddr:7070"
 proxy="-x http://jiangu:Bag%400305@10.10.40.10:80"
+#proxy="-x http://jiangu:Bag%400305@172.16.2.17:8080"
+#proxy="-x http://jiangu:Bag%400305@10.80.60.19:8080"
 # use Proxy varible while reach the limitation
 Proxy=
-#proxy=
 
 function getv() {
 	local key=$1
@@ -83,24 +80,20 @@ function getv() {
 	rm -f $conf link_head.txt
 }
 
-if [ $# -ge 1 ]; then
-	if [ $1 == "-p" ]; then
+while [ $# -ge 1 ]
+do
+	if [ $1 == "-x" ]; then
+		shift
+		proxy=
+		continue
+	elif [ $1 == "-p" ]; then
 		shift
 		if [ $# -ge 1 ]; then
 			proxy=$1
 			shift
 		fi
-	elif [ $1 == "-P" ]; then
-		shift
-		if [ $# -ge 1 ]; then
-			Proxy=$1
-			shift
-		fi
+		continue
 	fi
-fi
-
-while [ $# -ge 1 ]
-do
 	key=$1
 	[ "${key:0:4}" == "http" ] && key=`echo $key | sed -ne "s/http:\/\/.*\/video\/\([0-9a-f]\+\)\/.*/\1/p"`
 	getv $key
