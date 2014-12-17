@@ -55,6 +55,6 @@ OkFile $keylist
 [ $list_mode -eq 1 ] && tac $keylist
 
 if [ $down_flag -eq 1 ]; then
-	list=`cut -d' ' -f1 $keylist | tac`
+	list=`cut -f1 $keylist | tac`
 	./mgetv.sh $list
 fi
