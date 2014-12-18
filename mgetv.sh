@@ -7,6 +7,7 @@ proxy="-x http://jiangu:Bag%400305@10.10.40.10:80"
 #proxy="-x http://jiangu:Bag%400305@10.80.60.19:8080"
 # use Proxy varible while reach the limitation
 Proxy=
+check_fail_type=0
 
 function getv() {
 	local key=$1
@@ -50,31 +51,35 @@ function getv() {
 			done
 			break;
 		fi
-		link=`sed -ne "s/^[ \t]*<link>\(http:\/\/.*\/video\/[0-9]\+\)<\/link>.*$/\1/p" $conf`
-		curl -Is $proxy $link > link_head.txt
-		err_type=`sed -ne "s/^Location:.*\/needtoken\/\([^\/]\+\)\/[0-9]\+$/\1/p" link_head.txt`
-		if [ "$err_type" == "reach_limit" ]; then
-			if [ -z "$proxy" -a -n "$Proxy" ]; then
-				echo "try using proxy to get config"
-				continue
-			fi
-			echo "reach limit, waiting for an hour and try it again..."
-		elif [ "$err_type" == "long_video" ]; then
-			echo "the video is too long, ignored..."
-			break
-		elif [ "$err_type" == "hd_video" ]; then
-			echo "hd_video, no permission, ignored..."
-			break
-		else
-			grep -q "^Location:.*\/video_missing$" link_head.txt
-			if [ $? -eq 0 ]; then
-				echo "Missing video..."
-				break
-			fi
-			echo "unknown error type, ignore"
-		fi
-		((hours--))
-		sleep 3600
+        if [ $check_fail_type -eq 0 ]; then
+            break
+        else
+            link=`sed -ne "s/^[ \t]*<link>\(http:\/\/.*\/video\/[0-9]\+\)<\/link>.*$/\1/p" $conf`
+            curl -Is $proxy $link > link_head.txt
+            err_type=`sed -ne "s/^Location:.*\/needtoken\/\([^\/]\+\)\/[0-9]\+$/\1/p" link_head.txt`
+            if [ "$err_type" == "reach_limit" ]; then
+                if [ -z "$proxy" -a -n "$Proxy" ]; then
+                    echo "try using proxy to get config"
+                    continue
+                fi
+                echo "reach limit, waiting for an hour and try it again..."
+            elif [ "$err_type" == "long_video" ]; then
+                echo "the video is too long, ignored..."
+                break
+            elif [ "$err_type" == "hd_video" ]; then
+                echo "hd_video, no permission, ignored..."
+                break
+            else
+                grep -q "^Location:.*\/video_missing$" link_head.txt
+                if [ $? -eq 0 ]; then
+                    echo "Missing video..."
+                    break
+                fi
+                echo "unknown error type, ignore"
+            fi
+            ((hours--))
+            sleep 3600
+        fi
 	done
 
 	rm -f $conf link_head.txt
@@ -85,6 +90,10 @@ do
 	if [ $1 == "-x" ]; then
 		shift
 		proxy=
+		continue
+	elif [ $1 == "-c" ]; then
+		shift
+		check_fail_type=1
 		continue
 	elif [ $1 == "-p" ]; then
 		shift
