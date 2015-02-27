@@ -33,7 +33,7 @@ function OkFile()
     local fil=$1
     [ -z "$fil" ] && return 0
     [ ! -f $fil ] && return 0
-    [ `stat -c %s $fil` -eq 0 ] && return 0
+    [ `stat -c %s $fil` == "0" ] && return 0
 
     return 1
 }
