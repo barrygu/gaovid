@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#proxy="-e http_proxy=http://jiangu:Bag%400305@10.10.40.10:80"
+#proxy="-e http_proxy=http://10.10.40.10:80"
 
 [ $# -lt 1 ] && exit
 
