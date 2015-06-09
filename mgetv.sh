@@ -2,8 +2,8 @@
 
 #ipaddr=`echo $SSH_CLIENT | sed "s/ .*//"`
 #proxy="--socks5 $ipaddr:7070"
-[ -z "$proxy" ] && proxy="-x http://jiangu:Bag%400305@10.10.40.10:80"
-#proxy="-x http://jiangu:Bag%400305@172.16.2.17:8080"
+[ -z "$proxy" ] && proxy="-x http://jiangu:Bag%400305@172.16.2.17:8080"
+#proxy="-x http://jiangu:Bag%400305@10.10.40.10:80"
 #proxy="-x http://jiangu:Bag%400305@10.80.60.19:8080"
 # use Proxy varible while reach the limitation
 Proxy=
@@ -45,7 +45,9 @@ function getv() {
 		if [ -n "$file" ]; then
 			for (( retry = 5; retry > 0; retry-- ))
 			do
-				curl -O $proxy $file
+				cmd="curl -O $proxy $file"
+				echo $cmd
+				eval $cmd
 				[ $? -eq 0 ] && break
 				sleep 120
 			done
