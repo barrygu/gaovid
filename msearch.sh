@@ -21,6 +21,8 @@ while [ $# -ge 2 ]; do
 done
 
 key=$1
+#ipaddr=199.195.197.133
+#ipaddr=199.195.197.134
 ipaddr=199.195.197.140
 query_url="http://$ipaddr/search?search_type=videos&search_query="
 query_result=result_$key.html
@@ -37,6 +39,13 @@ function OkFile()
 
     return 1
 }
+
+#
+# previous page NO.
+# cat $query_result | sed -ne '/pagination/{s/.*page=\([0-9]\+\)[^<]\+&laquo;.*/\1/p;}'
+# next page NO.
+# cat $query_result | sed -ne '/pagination/{s/.*page=\([0-9]\+\)[^<]\+&raquo;.*/\1/p;}'
+#
 
 OkFile $query_result
 [ $? -eq 0 ] && wget $proxy -O $query_result "$query_url$key"
