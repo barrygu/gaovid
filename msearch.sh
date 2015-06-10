@@ -71,7 +71,10 @@ fi
 OkFile $keylist
 [ $? -eq 0 ] && continue
 
-[ $list_mode -eq 1 ] && tac $keylist
+if [ $list_mode -eq 1 ]; then
+	printf "\n>>> Page: $page <<<\n"
+	tac $keylist
+fi
 
 if [ $down_flag -eq 1 ]; then
 	list=`cut -f1 $keylist | tac`
