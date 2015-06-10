@@ -6,6 +6,8 @@
 
 list_mode=1
 down_flag=0
+multi_page=0
+max_pages=99999
 
 while [ $# -ge 2 ]; do
     if [ "$1" == "-l" ]; then
@@ -14,6 +16,11 @@ while [ $# -ge 2 ]; do
         down_flag=1
     elif [ "$1" == "-x" ]; then
         proxy="--no-proxy"
+#    elif [ "$1" == "-m" ]; then
+#		multi_page=1
+    elif [[ $1 =~ -m[0-9]*$ ]]; then
+		multi_page=1
+		[ ${#1} -eq 2 ] || max_pages=${1:2}
     else
         break;
     fi
@@ -21,12 +28,10 @@ while [ $# -ge 2 ]; do
 done
 
 key=$1
+page=1
 #ipaddr=199.195.197.133
 #ipaddr=199.195.197.134
 ipaddr=199.195.197.140
-query_url="http://$ipaddr/search?search_type=videos&search_query="
-query_result=result_$key.html
-keylist=list_$key.txt
 
 function OkFile()
 {
@@ -47,8 +52,13 @@ function OkFile()
 # cat $query_result | sed -ne '/pagination/{s/.*page=\([0-9]\+\)[^<]\+&raquo;.*/\1/p;}'
 #
 
+while ((1)); do
+query_url="http://$ipaddr/search?search_type=videos&search_query=$key&page=$page"
+query_result=result_$key-$page.html
+keylist=list_$key-$page.txt
+
 OkFile $query_result
-[ $? -eq 0 ] && wget $proxy -O $query_result "$query_url$key"
+[ $? -eq 0 ] && wget $proxy -O $query_result "$query_url"
 
 OkFile $keylist
 if [ $? -eq 0 ]; then
@@ -59,7 +69,7 @@ if [ $? -eq 0 ]; then
 fi
 
 OkFile $keylist
-[ $? -eq 0 ] && exit
+[ $? -eq 0 ] && continue
 
 [ $list_mode -eq 1 ] && tac $keylist
 
@@ -67,3 +77,11 @@ if [ $down_flag -eq 1 ]; then
 	list=`cut -f1 $keylist | tac`
 	./mgetv.sh $list
 fi
+
+if [ $multi_page -eq 1 ]; then
+	[ $page -ge $max_pages ] && break
+	page=$(cat $query_result | sed -ne '/pagination/{s/.*page=\([0-9]\+\)[^<]\+&raquo;.*/\1/p;}')
+	[ -z "$page" ] && break
+fi
+
+done
