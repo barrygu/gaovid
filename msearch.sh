@@ -30,8 +30,8 @@ done
 key=$1
 page=1
 #ipaddr=199.195.197.133
-#ipaddr=199.195.197.134
-ipaddr=199.195.197.140
+ipaddr=199.195.197.134
+#ipaddr=199.195.197.140
 
 function OkFile()
 {
@@ -69,7 +69,11 @@ if [ $? -eq 0 ]; then
 fi
 
 OkFile $keylist
-[ $? -eq 0 ] && continue
+if [ $? -eq 0 ]; then
+	echo "List fail, stopped."
+	rm $keylist
+	break
+fi
 
 if [ $list_mode -eq 1 ]; then
 	printf "\n>>> Page: $page <<<\n"
@@ -85,6 +89,8 @@ if [ $multi_page -eq 1 ]; then
 	[ $page -ge $max_pages ] && break
 	page=$(cat $query_result | sed -ne '/pagination/{s/.*page=\([0-9]\+\)[^<]\+&raquo;.*/\1/p;}')
 	[ -z "$page" ] && break
+else
+	break
 fi
 
 done
