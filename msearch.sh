@@ -100,7 +100,7 @@ do
 done
 
 page=1
-fil=list.txt
+fil=list_$key.txt
 [ -f $fil ] && rm $fil
 while [ $page -le $last_page ]
 do
