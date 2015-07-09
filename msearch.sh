@@ -79,10 +79,10 @@ do
 		break
 	fi
 
-	if [ $list_mode -eq 1 ]; then
-		printf "\n>>> Page: $page <<<\n"
-		tac $keylist
-	fi
+#	if [ $list_mode -eq 1 ]; then
+#		printf "\n>>> Page: $page <<<\n"
+#		tac $keylist
+#	fi
 
 	if [ $down_flag -eq 1 ]; then
 		list=`cut -f1 $keylist | tac`
@@ -101,10 +101,15 @@ done
 
 page=1
 fil=list_$key.txt
-[ -f $fil ] && rm $fil
-while [ $page -le $last_page ]
-do
-	printf "\n>>> Page: $page <<<\n" >> $fil
-	cat Data/list_$key-$page.txt >> $fil
-	(( page++ ))
-done
+if [ ! -f $fil ]; then
+	while [ $page -le $last_page ]
+	do
+		printf "\n>>> Page: $page <<<\n" >> $fil
+		cat Data/list_$key-$page.txt >> $fil
+		(( page++ ))
+	done
+fi
+
+if [ $list_mode -eq 1 ]; then
+	cat $fil
+fi
