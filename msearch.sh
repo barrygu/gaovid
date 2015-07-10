@@ -105,14 +105,15 @@ if [ ! -f $fil ]; then
 	while [ $page -le $last_page ]
 	do
 		printf "\n>>> Page: $page <<<\n" >> $fil
-		cat Data/list_$key-$page.txt >> $fil
+		#cat Data/list_$key-$page.txt >> $fil
+		awk 'BEGIN { OFS = "" } { printf "%s | %5s | %8s | ", $1, $2, $3; $1=$2=$3=""; print $0 }' Data/list_$key-$page.txt >> "$fil"
 		(( page++ ))
 	done
 fi
 
 if [ $list_mode -eq 1 ]; then
-	#cat $fil
+	cat $fil
 	#awk '{ if ( NF && $1 !~ /^>/ ) { printf "%-24s%8s%10s", $1, $2, $3; $1=$2=$3="" } print $0 }' "$fil"
 	#awk '{ if ( NF && $1 != ">>>" ) { printf "%-24s%8s%10s", $1, $2, $3; $1=$2=$3="" } print $0 }' "$fil"
-	awk 'BEGIN { OFS = "" } { if ( NF && $1 !~ /^>/ ) { printf "%s | %5s | %8s | ", $1, $2, $3; $1=$2=$3="" } print $0 }' "$fil"
+	#awk 'BEGIN { OFS = "" } { if ( NF && $1 !~ /^>/ ) { printf "%s | %5s | %8s | ", $1, $2, $3; $1=$2=$3="" } print $0 }' "$fil"
 fi
