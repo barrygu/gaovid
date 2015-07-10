@@ -112,5 +112,5 @@ fi
 
 if [ $list_mode -eq 1 ]; then
 	#cat $fil
-	awk -F '\t' '{ if ( NF >= 4) { gsub(" ","",$1);gsub(" ","",$2);gsub(" ","",$3); }; printf "%s\t%16s\t%10s\t%s\n", $1, $2, $3, $4 }' "$fil"
+	awk '{ if (NF && $1 != ">>>" ) { printf "%-24s%8s%10s", $1, $2, $3; $1=$2=$3=""}; print $0 }' "$fil"
 fi
