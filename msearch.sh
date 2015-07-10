@@ -113,5 +113,6 @@ fi
 if [ $list_mode -eq 1 ]; then
 	#cat $fil
 	#awk '{ if ( NF && $1 !~ /^>/ ) { printf "%-24s%8s%10s", $1, $2, $3; $1=$2=$3="" } print $0 }' "$fil"
-	awk '{ if ( NF && $1 != ">>>" ) { printf "%-24s%8s%10s", $1, $2, $3; $1=$2=$3="" } print $0 }' "$fil"
+	#awk '{ if ( NF && $1 != ">>>" ) { printf "%-24s%8s%10s", $1, $2, $3; $1=$2=$3="" } print $0 }' "$fil"
+	awk 'BEGIN { OFS = "" } { if ( NF && $1 !~ /^>/ ) { printf "%s | %5s | %8s | ", $1, $2, $3; $1=$2=$3="" } print $0 }' "$fil"
 fi
