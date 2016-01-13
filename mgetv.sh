@@ -14,7 +14,8 @@ function getv() {
 	local retry=5
 	local hours=10
 	#local ipaddr=gaovideo.com
-	local ipaddr=199.195.197.140
+	#local ipaddr=www.bao67.com
+	local ipaddr=199.195.197.134
 	local conf=config_"$key".txt
 	local file=
 	local link=

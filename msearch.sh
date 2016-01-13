@@ -30,6 +30,8 @@ done
 key=$1
 page=1
 last_page=1
+#ipaddr=gaovideo.com
+#ipaddr=www.bao67.com
 #ipaddr=199.195.197.133
 ipaddr=199.195.197.134
 #ipaddr=199.195.197.140
