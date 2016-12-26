@@ -2,7 +2,8 @@
 
 #ipaddr=`echo $SSH_CLIENT | sed "s/ .*//"`
 #proxy="--socks5 $ipaddr:7070"
-[ -z "$proxy" ] && proxy="-x http://172.16.2.17:8080"
+#[ -z "$proxy" ] && proxy="-x http://172.16.2.17:8080"
+[ -z "$proxy" ] && proxy="-x http://10.10.40.10:80"
 #proxy="-x http://10.10.40.10:80"
 #proxy="-x http://10.80.60.19:8080"
 # use Proxy varible while reach the limitation
