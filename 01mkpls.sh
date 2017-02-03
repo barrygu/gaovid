@@ -1,10 +1,11 @@
 #!/bin/sh
 
-lines=$(wc -l 00index.txt)
+lines=$(cat 00index.txt | wc -l)
 
-printf "[playlist]\nNumberOfEntries=%d\n" > 01index.pls
+list=( "[playlist]" "NumberOfEntries=${lines}" )
 index=0
 while read -d $'\n' line; do
     (( index++ ))
-    printf "File%d=%s\nTitle%d=%s\n" $index "${line%% *}" $index "${line#* }"
-done < 00index.txt >> 01index.pls
+    list+=( "File${index}=${line%% *}" "Title${index}=${line#* }" )
+done < 00index.txt
+printf "%s\n" "${list[@]}" > 01index.pls
